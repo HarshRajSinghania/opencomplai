@@ -83,46 +83,34 @@ scan of the current directory with no manifest required and never gates your bui
 opencomplai scan --quick
 ```
 
-### Controlling what the scanner reads (`.ocignore`)
+### Controlling what the scanner sees (`.ocignore`)
 
-`opencomplai scan` and `opencomplai check` do **not** read `.gitignore` at scan
-time. Exclusion patterns and inventory limits come from a repo-root
-[`.ocignore`](.ocignore) file (gitignore-like `fnmatch` patterns, plus an
-optional `[limits]` block).
+`opencomplai scan` and `opencomplai check` do **not** read `.gitignore` while
+walking the tree. They use a repo-root [`.ocignore`](.ocignore) file instead
+(gitignore-like `fnmatch` patterns plus an optional `[limits]` block).
 
-On the first `opencomplai scan`, the CLI can create a default `.ocignore` and
-optionally copy non-comment lines from an existing `.gitignore` **once**. After
-that, only `.ocignore` is used. Review the file before relying on results:
-patterns decide which files are inventoried, and a missing or overly broad
-ignore list can hide or inflate findings.
+On first scan the CLI can create a default `.ocignore` and copy non-comment
+lines from an existing `.gitignore` once (`--no-ocignore-bootstrap` disables
+that). After that, `.gitignore` is ignored at scan time — keep secrets and
+build artifacts in `.ocignore` if you want them excluded from inventory.
 
 Minimal example:
 
 ```gitignore
-# Opencomplai scan configuration
-# Trailing / matches a directory; *.ext matches that extension at any depth.
-# Negation (!pattern) and ** recursive globs are not supported in v1.
-
+# Pattern lines: ocignore subset v1 (fnmatch; trailing / = directory)
 [limits]
-max_files = 10000
-max_bytes_per_file = 2097152
-skip_binary = true
+max_files = 0
+skip_binary = false
 
-# --- Exclusions ---
-.git/
 node_modules/
 .venv/
-__pycache__/
+.git/
 *.pem
-examples/
+*.key
 ```
 
-Use `--no-ocignore-bootstrap` in CI when `.ocignore` is already committed, or
-`--ocignore PATH` for a file other than the repo-root default (the path must
-stay inside `--repo-root`).
-
-Full syntax, limit keys, and precedence versus `opencomplai.yaml` and CLI flags:
-[`.ocignore` scan configuration](https://docs.opencomplai.com/getting-started/scanner#ocignore).
+Full syntax, limits, and CI notes:
+[`.ocignore` scan configuration](https://docs.opencomplai.com/getting-started/scanner/#ocignore).
 
 ### Pre-commit hook
 
