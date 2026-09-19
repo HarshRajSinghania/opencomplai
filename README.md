@@ -89,18 +89,17 @@ opencomplai scan --quick
 walking the tree. They use a repo-root [`.ocignore`](.ocignore) file instead
 (gitignore-like `fnmatch` patterns plus an optional `[limits]` block).
 
-On first scan the CLI can create a default `.ocignore` and copy non-comment
-lines from an existing `.gitignore` once (`--no-ocignore-bootstrap` disables
-that). After that, `.gitignore` is ignored at scan time — keep secrets and
+On first **scan** the CLI can create a default `.ocignore` and copy non-comment
+lines from an existing `.gitignore` once. Pass `--no-ocignore-bootstrap` on
+`opencomplai scan` to disable that (this flag is scan-only; `opencomplai check`
+always bootstraps and does not accept `--ocignore` / `--no-ocignore-bootstrap`).
+After that, `.gitignore` is ignored at scan time — keep secrets and
 build artifacts in `.ocignore` if you want them excluded from inventory.
 
 Minimal example:
 
 ```gitignore
 # Pattern lines: ocignore subset v1 (fnmatch; trailing / = directory)
-[limits]
-max_files = 0
-skip_binary = false
 
 node_modules/
 .venv/
